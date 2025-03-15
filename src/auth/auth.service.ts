@@ -1,12 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/auth.entity';
-
-import { AdapterBcrypt } from './adapters/adapter-bcrypt';
+import { AdapterBcrypt } from './adapters/adapter-bcryptjs';
+import { CreateUserDto, LoginUserDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -25,11 +24,37 @@ export class AuthService {
       });
 
       await this.userRepository.save(user);
+      delete user.password;
 
       return user;
+
+      //TODO Retornar el JWT de acceso.
     } catch (error) {
       this.handleDBExceptions(error);
     }
+  }
+
+  async login(loginUserDto: LoginUserDto) {
+    const { email, password } = loginUserDto;
+
+    const user = await this.userRepository.findOne({
+      where: { email },
+      select: ['email', 'password'],
+    });
+
+    if (!user) throw new UnauthorizedException('Invalid credentials (email)');
+
+    const isPasswordMatch = await this.bcryptAdapter.compareSync(
+      password,
+      user.password,
+    );
+
+    if (!isPasswordMatch)
+      throw new UnauthorizedException('Invalid credentials (password)');
+
+    return user;
+
+    //TODO Retornar el JWT de acceso.
   }
 
   private handleDBExceptions(error: any) {

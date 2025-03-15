@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { User } from './entities/auth.entity';
-import { AdapterBcrypt } from './adapters/adapter-bcrypt';
+import { AdapterBcrypt } from './adapters/adapter-bcryptjs';
 
 @Module({
   controllers: [AuthController],

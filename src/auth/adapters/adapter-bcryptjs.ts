@@ -9,10 +9,10 @@ export interface IAdapterBcrypt {
 @Injectable()
 export class AdapterBcrypt implements IAdapterBcrypt {
   async hashSync(password: string) {
-    return await hashSync(password, 10);
+    return hashSync(password, 10);
   }
 
   async compareSync(password: string, hash: string) {
-    return await compareSync(password, hash);
+    return compareSync(password, hash);
   }
 }
