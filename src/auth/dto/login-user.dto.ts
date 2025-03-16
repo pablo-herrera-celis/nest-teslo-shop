@@ -5,10 +5,12 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class LoginUserDto {
   @IsEmail()
   @IsString()
+  @Transform(({ value }) => value.toLowerCase().trim())
   email: string;
 
   @IsString()
