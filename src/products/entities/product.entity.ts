@@ -1,8 +1,19 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+
+import { User } from '../../auth/entities/auth.entity';
+
 import { ProductImage } from '.';
 
 @Entity({
-  name: 'products'
+  name: 'products',
 })
 export class Product {
   @PrimaryGeneratedColumn('uuid')
@@ -42,20 +53,21 @@ export class Product {
   @Column('text')
   gender: string;
 
-  @Column('text',{
+  @Column('text', {
     array: true,
-    default:[]
+    default: [],
   })
   tags: string[];
 
   //images
-  @OneToMany(
-    ()=> ProductImage,
-    (productImage)=> productImage.product,
-    {cascade: true, eager: true}
-  )
+  @OneToMany(() => ProductImage, (productImage) => productImage.product, {
+    cascade: true,
+    eager: true,
+  })
   images?: ProductImage[];
 
+  @ManyToOne(() => User, (user) => user.product, { eager: true })
+  user: User;
 
   @BeforeInsert()
   checkSlugInsert() {
