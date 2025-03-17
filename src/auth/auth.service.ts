@@ -26,7 +26,7 @@ export class AuthService {
       const { password, ...dataUser } = createUserDto;
       const user = this.userRepository.create({
         ...dataUser,
-        password: await this.bcryptAdapter.hashSync(password),
+        password: this.bcryptAdapter.hashSync(password),
       });
 
       await this.userRepository.save(user);
@@ -51,7 +51,7 @@ export class AuthService {
 
     if (!user) throw new UnauthorizedException('Invalid credentials (email)');
 
-    const isPasswordMatch = await this.bcryptAdapter.compareSync(
+    const isPasswordMatch = this.bcryptAdapter.compareSync(
       password,
       user.password,
     );

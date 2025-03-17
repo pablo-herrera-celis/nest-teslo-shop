@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import { ProductsService } from '../products/products.service';
 import { User } from '../auth/entities/auth.entity';
+import { AdapterBcrypt } from '../auth/adapters/adapter-bcryptjs';
 
 import { initialData } from './data/seed-data';
 
@@ -14,6 +15,8 @@ export class SeedService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    private readonly adapterBcrypt: AdapterBcrypt,
   ) {}
 
   async runSeed() {
@@ -36,10 +39,16 @@ export class SeedService {
     const users: User[] = [];
 
     seedUsers.forEach((user) => {
-      users.push(this.userRepository.create(user));
+      const { password, ...rest } = user;
+      users.push(
+        this.userRepository.create({
+          ...rest,
+          password: this.adapterBcrypt.hashSync(password),
+        }),
+      );
     });
 
-    const dbUser = await this.userRepository.save(seedUsers);
+    const dbUser = await this.userRepository.save(users);
 
     return dbUser[0];
   }
