@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
+import { ApiResponse } from '@nestjs/swagger';
 
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { Auth, GetUser } from '../auth/decorators';
@@ -18,6 +19,7 @@ import { User } from '../auth/entities/auth.entity';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Product } from './entities';
 
 @Controller('products')
 export class ProductsController {
@@ -25,6 +27,19 @@ export class ProductsController {
 
   @Post()
   @Auth()
+  @ApiResponse({
+    status: 201,
+    description: 'The product has been successfully created',
+    type: Product,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'The product has not been created',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Unauthorized',
+  })
   create(@Body() createProductDto: CreateProductDto, @GetUser() user: User) {
     return this.productsService.create(createProductDto, user);
   }
